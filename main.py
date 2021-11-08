@@ -259,9 +259,9 @@ class CreateWork(QMainWindow):
 
     def ch3(self, state):
         if state == Qt.Checked:
-            self.checklist = [self.checklist[0], self.checklist[2], True]
+            self.checklist = [self.checklist[0], self.checklist[1], True]
         else:
-            self.checklist = [self.checklist[0], self.checklist[2], False]
+            self.checklist = [self.checklist[0], self.checklist[1], False]
 
     def ready(self):
         a = SolveWork(self, self.checklist, self.spinBox.value())
@@ -293,6 +293,7 @@ class SolveWork(QMainWindow):
     def __init__(self, parent=None, tlist=None, count=None):
         super(SolveWork, self).__init__(parent)
         uic.loadUi('Solve_Cases.ui', self)
+        self.otlad = tlist
         self.unical = tlist[0]
         self.new_list = tlist[1]
         self.answers = tlist[2]
@@ -335,7 +336,6 @@ class SolveWork(QMainWindow):
             self.b11.addItem(str(i[0]))
         self.b11.activated[str].connect(self.case_changed)
         self.con.close()
-        print(text)
 
     def case_changed(self, text):
         self.list_of_cases.append(text)
@@ -343,7 +343,6 @@ class SolveWork(QMainWindow):
         self.listWidget.addItems(self.list_of_cases)
         self.a11.hide()
         self.b11.hide()
-        print(text)
 
     def choose_directory(self):
         dirlist = QFileDialog.getExistingDirectory(self, "Выбрать папку", ".")
@@ -381,14 +380,14 @@ class SolveWork(QMainWindow):
         formula = formula.replace('5(!)', str(e))
         ans = eval(formula)
         self.con.close()
-        return text, ans
+        return text, str(ans)
 
     def work_with_word(self, name):
         document = Document()
         slov_of_ans = {}
         if self.unical:
             for i in range(1, self.count + 1):
-                document.add_paragraph(("Вариант" + str(i)))
+                document.add_paragraph(("Вариант " + str(i)))
                 for j in self.list_of_cases:
                     text, ans = self.cook_case(j)
                     document.add_paragraph(text)
@@ -403,7 +402,7 @@ class SolveWork(QMainWindow):
             if self.answers:
                 for i in slov_of_ans.keys():
                     document.add_paragraph(str(i))
-                    document.add_paragraph(' '.join(slov_of_ans[i]))
+                    document.add_paragraph(str(', '.join(slov_of_ans[i])))
         else:
             ansers = []
             texts = []
@@ -418,6 +417,7 @@ class SolveWork(QMainWindow):
                 if self.new_list:
                     document.add_page_break()
             if self.answers:
+                document.add_page_break()
                 document.add_paragraph(' '.join(ansers))
         document.save(self.path + '\\' + name + '.docx')
 
